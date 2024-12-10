@@ -10,11 +10,14 @@
 
 global  memoria
 global  regs
-global executar  
+global executar
+extern print_registradores 
 segment  .data
      memoria:times 65536 db 0 
      FIM_PILHA equ $ ; aponta para o fim da memoria
      regs: times 8 dd 0000
+
+     invalido_msg db "Instrução Inválida",0ah
      
      negativo: db 0 
      zero:db 0
@@ -53,11 +56,89 @@ obter_tamanho_registrador:
     mov r8, qword 32
     ret
 
-PUSH_OP:
-POP_OP:
+invalid_instruction:
+     mov rax, 4
+     mov rbx, 1
+     mov rcx, invalido_msg
+     mov rdx, 21
+     int 0x80
      ret
+
+PUSH_OP:
+     inc rsi ; avança para pegar o byte do registrador
+     xor r9, r9
+     xor r8, r8 ; limpa r8
+     xor rax, rax ; limpa rax
+     xor rbx, rbx ; limpa rbx
+     mov al, byte [rsi] ; pega o byte do registrador
+     shr al, 4 ; desloca 4 bits para a direita para pegar o código do registrador
+     mov r8, rax ; move o codigo do registrador(salvo em rax) para r8
+     call obter_tamanho_registrador
+
+     lea r9, [r15+rax*4] ; calcula o endereço do registrador
+     inc rsi ; avança para o rsi apontar para a proxima instrucao
+     cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+     je PUSH_8_bits
+     cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+     je PUSH_32_bits
+
+     PUSH_16_bits: ; se não é um dos dois, então é de 16 bits
+          mov bx, word [r9] ; pega 2 bytes seguidos da pilha
+          sub rdi, 2
+          mov word [rdi], bx
+          jmp eterno ; sai da função
+
+     PUSH_8_bits:
+          mov bl, byte [r9] ; pega 1 byte da pilha
+          sub rdi, 1
+          mov byte [rdi], bl
+          jmp eterno ; sai da função
+
+     PUSH_32_bits:
+          mov ebx, dword [r9] ; pega 4 bytes seguidos da pilha
+          sub rdi, 4
+          mov dword [rdi], ebx
+          jmp eterno ; sai da função
+
+POP_OP:
+     inc rsi ; avança para pegar o byte do registrador
+     xor r9, r9
+     xor r8, r8 ; limpa r8
+     xor rax, rax ; limpa rax
+     xor rbx, rbx ; limpa rbx
+     mov al, byte [rsi] ; pega o byte do registrador
+     shr al, 4 ; desloca 4 bits para a direita para pegar o código do registrador
+     mov r8, rax ; move o codigo do registrador(salvo em rax) para r8
+     call obter_tamanho_registrador
+
+     lea r9, [r15+rax*4] ; calcula o endereço do registrador
+     inc rsi ; avança para o rsi apontar para a proxima instrucao
+     cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+     je POP_8_bits
+     cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+     je POP_32_bits
+
+     POP_16_bits: ; se não é um dos dois, então é de 16 bits
+          mov bx, word [rdi] ; pega 2 bytes seguidos da pilha
+          add rdi, 2
+          mov word [r9], bx
+          jmp eterno ; sai da função
+
+     POP_8_bits:
+          mov bl, byte [rdi] ; pega 1 byte da pilha
+          add rdi, 1
+          mov byte [r9], bl
+          jmp eterno ; sai da função
+
+     POP_32_bits:
+          mov ebx, dword [rdi] ; pega 4 bytes seguidos da pilha
+          add rdi, 4
+          mov dword [r9], ebx
+          jmp eterno ; sai da função
+          
 LOADC_OP:
      inc rsi ; avança para pegar os proximos bytes
+     xor r9, r9
      xor r8, r8 ; limpa r8
      xor rax, rax ; limpa rax
      xor rbx, rbx ; limpa rbx
@@ -75,25 +156,26 @@ LOADC_OP:
 
      LOADC_16_bits: ; se não é um dos dois, então é de 16 bits
           mov bx, word [rsi] ; pega 2 bytes seguidos da memoria
-          mov [r9], rbx
+          mov word [r9], bx
           add rsi, 2 ; avança 2 bytes
           jmp eterno ; sai da função
 
      LOADC_8_bits:
           mov bl, byte [rsi] ; pega 1 byte da memoria
-          mov [r9], rbx
+          mov byte [r9], bl
           add rsi, 1 ; avança 1 byte
           jmp eterno ; sai da função
 
      LOADC_32_bits:
           mov ebx, dword [rsi] ; pega 4 bytes seguidos da memoria
-          mov [r9], rbx
+          mov dword [r9], ebx
           add rsi, 4 ; avança 4 bytes
           jmp eterno ; sai da função
 
 LOAD_END_OP:
      inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
+     xor r9, r9
      xor r10, r10 ; limpa r10
      xor rax, rax ; limpa rax
      xor rbx, rbx ; limpa rbx
@@ -115,22 +197,23 @@ LOAD_END_OP:
 
      LOAD_END_16_bits:
           mov bx, word [r10] ; pega 2 bytes seguidos da memoria a partir do endereço calculado(r10)
-          mov [r9], rbx
+          mov word [r9], bx
           jmp eterno ; sai da função
 
      LOAD_END_8_bits:
           mov bl, byte [r10] ; pega 1 byte da memoria a partir do endereço calculado(r10)
-          mov [r9], rbx
+          mov byte [r9], bl
           jmp eterno ; sai da função
 
      LOAD_END_32_bits:
           mov ebx, dword [r10] ; pega 4 bytes seguidos da memoria a partir do endereço calculado(r10)
-          mov [r9], rbx
+          mov dword [r9], ebx
           jmp eterno ; sai da função
 
 LOAD_RX_OP:
      inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
+     xor r9, r9
      xor r10, r10 ; limpa r10
      xor r11, r11 ; limpa r11
      xor rax, rax ; limpa rax
@@ -142,8 +225,7 @@ LOAD_RX_OP:
      mov r8, rcx ; move o codigo do registrador(salvo em rax) para r8
      call obter_tamanho_registrador
      cmp r8, qword 16
-     je LOAD_validado
-     ret
+     jne invalid_instruction
 
      LOAD_validado:
           mov al, byte [rsi] ; pega o byte do registrador
@@ -163,23 +245,24 @@ LOAD_RX_OP:
 
           LOAD_RX_16_bits:
                mov bx, word [r10] ; pega 2 bytes seguidos da memoria a partir do endereço calculado(r10)
-               mov [r9], rbx
+               mov word [r9], bx
                jmp eterno ; sai da função
 
           LOAD_RX_8_bits:
                mov bl, byte [r10] ; pega 1 byte da memoria a partir do endereço calculado(r10)
-               mov [r9], rbx
+               mov byte [r9], bl
                jmp eterno ; sai da função
 
           LOAD_RX_32_bits:
                mov ebx, dword [r10] ; pega 4 bytes seguidos da memoria a partir do endereço calculado(r10)
-               mov [r9], rbx
+               mov dword [r9], ebx
                jmp eterno ; sai da função
 
 
 STORE_END_OP:
      inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
+     xor r9, r9
      xor r10, r10 ; limpa r10
      xor rax, rax ; limpa rax
      xor rbx, rbx ; limpa rbx
@@ -203,17 +286,17 @@ STORE_END_OP:
 
      STORE_END_16_bits:
           mov bx, word [r9] ; pega 2 bytes seguidos da memoria a partir do endereço calculado(r10)
-          mov [r10], rbx
+          mov word [r10], bx
           jmp eterno ; sai da função
 
      STORE_END_8_bits:
           mov bl, byte [r9] ; pega 1 byte da memoria a partir do endereço calculado(r10)
-          mov [r10], rbx
+          mov byte [r10], bl
           jmp eterno ; sai da função
 
      STORE_END_32_bits:
           mov ebx, dword [r9] ; pega 4 bytes seguidos da memoria a partir do endereço calculado(r10)
-          mov [r10], rbx
+          mov dword [r10], ebx
           jmp eterno ; sai da função
 
 STORE_RX_OP:
@@ -231,8 +314,7 @@ STORE_RX_OP:
      mov r8, rcx ; move o codigo do registrador(salvo em rax) para r8
      call obter_tamanho_registrador
      cmp r8, qword 16
-     je STORE_validado
-     ret
+     jne invalid_instruction
 
      STORE_validado:
 
@@ -253,17 +335,17 @@ STORE_RX_OP:
 
           STORE_RX_16_bits:
                mov bx, word [r9]
-               mov [r10], rbx
+               mov word [r10], bx
                jmp eterno ; sai da função
 
           STORE_RX_8_bits:
                mov bl, byte [r9]
-               mov [r10], rbx
+               mov byte [r10], bl
                jmp eterno ; sai da função
 
           STORE_RX_32_bits:
                mov ebx, dword [r9]
-               mov [r10], rbx
+               mov dword [r10], ebx
                jmp eterno ; sai da função
 
 

@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
     int i=0,j=0, k=0;
     int8_t aux;
     if(argc == 1){
-        printf("Digite o código a ser executado em letras maiusculas, duas letras por byte, para constantes e endereços de memória utilize a ordem little endian\n");
+        printf("Digite o código a ser executado em letras maiusculas, duas letras por byte, ordem little endian(por exemplo, o endereço 0x001A deve ser digitado como 1A 00)\n");
         scanf("%s",buffer); // Lê o codigo digitado pelo usuario no terminal
     }
     else{
@@ -68,9 +68,9 @@ int main(int argc, char *argv[]){
             memoria[j++]=aux;
         }
         //print_memoria();
-        printf("Chamando modolo cpu asm \n");
+        printf("\nChamando modulo cpu asm \n");
         executar();
-        printf("Fim do Programa\n");
+        printf("\nFim do Programa\n");
         printf("A0=%d A1=%d D0=%d D1=%d D2=%d D3=%d H0=%d H1=%d \n" ,(int16_t) regs[0], (int16_t) regs[1], (int8_t) regs[2],(int8_t) regs[3], (int8_t) regs[4], (int8_t) regs[5], (int32_t) regs[6], (int32_t) regs[7]);
         print_memoria();
     }
