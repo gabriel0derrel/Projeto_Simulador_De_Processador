@@ -64,6 +64,27 @@ invalid_instruction:
      int 0x80
      ret
 
+flags:
+     mov al,0
+     jnz setazero ; Se não tiver dado 0, pula direto para a parte onde al é armazenado na variável zero, ignorando a atribuição al=1
+     mov al,1 ; Se tiver dado 0, al agora vale 1, assim agora zero receberá 1
+setazero:
+     mov byte [zero],al
+     mov al,0
+     jge setaneg ; Se não tiver dado negativo, pula direto para a parte onde al é armazenado na variável negativo, ignorando a atribuição al=1
+     mov al,1 ; Se tiver dado negativo, al agora vale 1, assim agora negativo receberá 1
+setaneg:
+     mov byte [negativo],al  
+     mov al, 0
+     jnc setacarry ; Se não haver carry, pula direto para a parte onde al é armazenado na variável carry, ignorando a atribuição al=1
+     mov al, 1 ; Se houver carry, al agora vale 1, assim agora carry receberá 1
+setacarry:
+     mov byte [carry], al
+     ret
+
+; -------------------
+; PUSH R - Código 00
+; 00 20 -> PUSH D0
 PUSH_OP:
      inc rsi ; avança para pegar o byte do registrador
      xor r9, r9
@@ -100,6 +121,9 @@ PUSH_OP:
           mov dword [rdi], ebx
           jmp eterno ; sai da função
 
+; -------------------
+; POP R - Código 01
+; 01 60 -> POP H0
 POP_OP:
      inc rsi ; avança para pegar o byte do registrador
      xor r9, r9
@@ -136,6 +160,11 @@ POP_OP:
           mov dword [r9], ebx
           jmp eterno ; sai da função
           
+; -----------------------------------
+; LOAD R, Const(xx ou xx xx ou xx xx xx xx) - Código 02
+; 02 10 1A 00 -> LOAD A1, 001A
+; 02 30 0A -> LOAD D1, 0A
+; 02 70 0B 00 0A 01 -> LOAD H1, 010A000B
 LOADC_OP:
      inc rsi ; avança para pegar os proximos bytes
      xor r9, r9
@@ -172,6 +201,9 @@ LOADC_OP:
           add rsi, 4 ; avança 4 bytes
           jmp eterno ; sai da função
 
+; -----------------------------
+; LOAD R, [xx xx] - Código 03
+; 03 40 1A 00 -> LOAD D2, [001A]
 LOAD_END_OP:
      inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
@@ -210,6 +242,9 @@ LOAD_END_OP:
           mov dword [r9], ebx
           jmp eterno ; sai da função
 
+; ----------------------------
+; LOAD R, [Rx] (Rx = A0 ou A1)- Código 04
+; 04 21 -> LOAD D0, A1
 LOAD_RX_OP:
      inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
@@ -258,7 +293,9 @@ LOAD_RX_OP:
                mov dword [r9], ebx
                jmp eterno ; sai da função
 
-
+; -------------------------------
+; STORE [xx xx], R Código 05
+; 05 1A 01 20 -> STORE [011A], D0
 STORE_END_OP:
      inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
@@ -285,20 +322,23 @@ STORE_END_OP:
      je STORE_END_32_bits
 
      STORE_END_16_bits:
-          mov bx, word [r9] ; pega 2 bytes seguidos da memoria a partir do endereço calculado(r10)
-          mov word [r10], bx
+          mov bx, word [r9] ; pega o valor do registrador apontado por r9
+          mov word [r10], bx ; Move o valor para a posição na memória apontada por r10
           jmp eterno ; sai da função
 
      STORE_END_8_bits:
-          mov bl, byte [r9] ; pega 1 byte da memoria a partir do endereço calculado(r10)
-          mov byte [r10], bl
+          mov bl, byte [r9] ; pega o valor do registrador apontado por r9
+          mov byte [r10], bl ; Move o valor para a posição na memória apontada por r10
           jmp eterno ; sai da função
 
      STORE_END_32_bits:
-          mov ebx, dword [r9] ; pega 4 bytes seguidos da memoria a partir do endereço calculado(r10)
-          mov dword [r10], ebx
+          mov ebx, dword [r9] ; pega o valor do registrador apontado por r9
+          mov dword [r10], ebx ; Move o valor para a posição na memória apontada por r10
           jmp eterno ; sai da função
 
+; --------------------------------
+; STORE [Rx], R (Rx = A0 ou A1)- Código 06
+; 06 16 -> STORE A1, H0
 STORE_RX_OP:
      inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
@@ -334,21 +374,23 @@ STORE_RX_OP:
           je STORE_RX_32_bits
 
           STORE_RX_16_bits:
-               mov bx, word [r9]
-               mov word [r10], bx
+               mov bx, word [r9] ; pega o valor do registrador apontado por r9
+               mov word [r10], bx ; Move o valor para a posição na memória apontada por r10
                jmp eterno ; sai da função
 
           STORE_RX_8_bits:
-               mov bl, byte [r9]
-               mov byte [r10], bl
+               mov bl, byte [r9] ; pega o valor do registrador apontado por r9
+               mov byte [r10], bl ; Move o valor para a posição na memória apontada por r10
                jmp eterno ; sai da função
 
           STORE_RX_32_bits:
-               mov ebx, dword [r9]
-               mov dword [r10], ebx
+               mov ebx, dword [r9] ; pega o valor do registrador apontado por r9
+               mov dword [r10], ebx ; Move o valor para a posição na memória apontada por r10
                jmp eterno ; sai da função
 
-
+; -----------------------------
+; HALT - Código 07
+; 07 -> HALT
 HALT_OP:
      ret
 
@@ -364,12 +406,31 @@ XOR_OP:
      ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
 NOT_OP:
      ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+
 CMP_OP:
      ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+
+; ---------------------------
+; JMP - Código 0F
+; 0F -> JMP
 JMP_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bx, word [rdi] ; Pega o endereço que está na pilha
+     add rdi, 2 ; Desempilha os 2 bytes
+     lea rsi, [memoria+rbx] ; Faz RSI apontar para esse endereço
+     jmp eterno ; Volta
+
+; -----------------------------
+; JL - Código 10
+; 10 -> JL
 JL_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bl, byte [negativo]
+     cmp bl, byte 1
+     je JMP_OP ; Se for negativo = 1, dá o jump
+     add rsi, 1 ; Senão, faz o RSI apontar para a próxima instrução
+     jmp eterno ; e volta
+
 JG_OP:
      ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
 JLE_OP:
