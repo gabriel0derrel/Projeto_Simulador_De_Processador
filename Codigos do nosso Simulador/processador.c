@@ -67,7 +67,7 @@ int main(int argc, char *argv[]){
             }
             memoria[j++]=aux;
         }
-        print_memoria();
+        //print_memoria();
         printf("Chamando modolo cpu asm \n");
         executar();
         printf("Fim do Programa\n");

@@ -57,7 +57,7 @@ PUSH_OP:
 POP_OP:
      ret
 LOADC_OP:
-     inc rsi
+     inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
      xor rax, rax ; limpa rax
      xor rbx, rbx ; limpa rbx
@@ -92,7 +92,7 @@ LOADC_OP:
           jmp eterno ; sai da função
 
 LOAD_END_OP:
-     inc rsi
+     inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
      xor r10, r10 ; limpa r10
      xor rax, rax ; limpa rax
@@ -129,7 +129,7 @@ LOAD_END_OP:
           jmp eterno ; sai da função
 
 LOAD_RX_OP:
-     inc rsi
+     inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
      xor r10, r10 ; limpa r10
      xor r11, r11 ; limpa r11
@@ -178,7 +178,7 @@ LOAD_RX_OP:
 
 
 STORE_END_OP:
-     inc rsi
+     inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
      xor r10, r10 ; limpa r10
      xor rax, rax ; limpa rax
@@ -217,7 +217,7 @@ STORE_END_OP:
           jmp eterno ; sai da função
 
 STORE_RX_OP:
-     inc rsi
+     inc rsi ; avança para pegar os proximos bytes
      xor r8, r8 ; limpa r8
      xor r9,r9 ; limpa r9
      xor r10, r10 ; limpa r10
@@ -244,7 +244,7 @@ STORE_RX_OP:
           lea r9, [regs+rax*4] ; calcula o endereço do registrador
           lea r10, [regs+rcx*4] ; calcula o endereço do registrador que possui o endereço de memória guardado
           mov r11w, word [r10] ; obtem o endereço salvo no registrador
-          ;lea r10, [memoria+r11] ; calcula o endereço na memória apontado pelo endereço salvo no registrador
+          lea r10, [memoria+r11] ; calcula o endereço na memória apontado pelo endereço salvo no registrador
           inc rsi
           cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
           je STORE_RX_8_bits
@@ -253,17 +253,17 @@ STORE_RX_OP:
 
           STORE_RX_16_bits:
                mov bx, word [r9]
-               mov [memoria+r11], rbx
+               mov [r10], rbx
                jmp eterno ; sai da função
 
           STORE_RX_8_bits:
                mov bl, byte [r9]
-               mov [memoria+r11], rbx
+               mov [r10], rbx
                jmp eterno ; sai da função
 
           STORE_RX_32_bits:
                mov ebx, dword [r9]
-               mov [memoria+r11], rbx
+               mov [r10], rbx
                jmp eterno ; sai da função
 
 
