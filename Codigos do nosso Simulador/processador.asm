@@ -534,7 +534,20 @@ JL_OP:
 ; 11 -> JG
 ; Se negativo == 0 E zero == 0
 JG_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bl, byte [negativo]
+     cmp bl, byte 0
+     jne NaoEverdade
+
+     mov bl, byte [zero]
+     cmp bl, byte 0
+     jne NaoEverdade
+
+     jump JMP_OP
+
+     NaoEverdade:
+          add rsi, 1
+          jmp eterno
 
 ; -----------------------------
 ; JLE - Código 12
