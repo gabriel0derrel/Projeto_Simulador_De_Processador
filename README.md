@@ -1,2 +1,2 @@
-# Projeto_Simulador_De_Processador_
+# Projeto_Simulador_De_Processador
 .
