@@ -469,7 +469,62 @@ ADD_OP:
 ; 09 10 -> SUB A1, A0
 ; R1 = R1 - R2
 SUB_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     inc rsi ; avança para pegar os proximos bytes
+     xor r8, r8 ; limpa r8
+     xor r9,r9 ; limpa r9
+     xor r10, r10 ; limpa r10
+     xor rax, rax ; limpa rax
+     xor rbx, rbx ; limpa rbx
+     xor rcx, rcx ; limpa rcx
+
+     mov al, byte [rsi]
+     shr al, 4 ; pega o código do primeiro registrador(o qual está na parte alta)
+     mov r8, rax ; move o codigo do registrador(salvo em rax) para r8
+     call obter_tamanho_registrador
+     push r8 ; Salva o tamanho do primeiro registrador na pilha
+
+     mov cl, byte [rsi]
+     and cl, 0fh ; pega o código do segundo registrador
+     mov r8, rcx
+     call obter_tamanho_registrador
+
+     pop rbx
+     cmp rbx, r8
+     jne invalid_instruction
+
+     SUB_validado:
+          lea r9, [regs+rax*4] ; calcula o endereço do registrador 1
+          lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
+          inc rsi
+
+          cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+          je SUB_8_bits
+          cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+          je SUB_32_bits
+
+          SUB_16_bits:
+               mov ax, word [r9] ; pega o valor do registrador 1
+               mov bx, word [r10] ; pega o valor do registrador 2
+               sub ax, bx
+               mov word [r9], ax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          SUB_8_bits:
+               mov al, byte [r9] ; pega o valor do registrador 1
+               mov bl, byte [r10] ; pega o valor do registrador 2
+               sub al, bl
+               mov byte [r9], al ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          SUB_32_bits:
+               mov eax, dword [r9] ; pega o valor do registrador 1
+               mov ebx, dword [r10] ; pega o valor do registrador 2
+               sub eax, ebx
+               mov dword [r9], eax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
 
 ; -----------------------------
 ; AND R1, R2 (tam de R1 == tam de R2) - Código 0A
