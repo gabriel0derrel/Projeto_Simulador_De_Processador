@@ -571,8 +571,13 @@ JLE_OP:
 ; 13 -> JGE
 ; Se negativo == 0
 JGE_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bl, byte [negativo]
+     cmp bl, byte 0
+     je JMP_OP
 
+     add rsi, 1
+     jmp eterno
 ; -----------------------------
 ; JC - Código 14
 ; 14 -> JC
