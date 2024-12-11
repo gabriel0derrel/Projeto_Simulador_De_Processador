@@ -9,6 +9,7 @@
 global  memoria
 global  regs
 global executar
+extern negativo, zero, carry
 extern getchar
 extern printf
 segment  .data
@@ -469,42 +470,354 @@ ADD_OP:
 ; 09 10 -> SUB A1, A0
 ; R1 = R1 - R2
 SUB_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     inc rsi ; avança para pegar os proximos bytes
+     xor r8, r8 ; limpa r8
+     xor r9,r9 ; limpa r9
+     xor r10, r10 ; limpa r10
+     xor rax, rax ; limpa rax
+     xor rbx, rbx ; limpa rbx
+     xor rcx, rcx ; limpa rcx
+
+     mov al, byte [rsi]
+     shr al, 4 ; pega o código do primeiro registrador(o qual está na parte alta)
+     mov r8, rax ; move o codigo do registrador(salvo em rax) para r8
+     call obter_tamanho_registrador
+     push r8 ; Salva o tamanho do primeiro registrador na pilha
+
+     mov cl, byte [rsi]
+     and cl, 0fh ; pega o código do segundo registrador
+     mov r8, rcx
+     call obter_tamanho_registrador
+
+     pop rbx
+     cmp rbx, r8
+     jne invalid_instruction
+
+     SUB_validado:
+          lea r9, [regs+rax*4] ; calcula o endereço do registrador 1
+          lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
+          inc rsi
+
+          cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+          je SUB_8_bits
+          cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+          je SUB_32_bits
+
+          SUB_16_bits:
+               mov ax, word [r9] ; pega o valor do registrador 1
+               mov bx, word [r10] ; pega o valor do registrador 2
+               sub ax, bx
+               mov word [r9], ax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          SUB_8_bits:
+               mov al, byte [r9] ; pega o valor do registrador 1
+               mov bl, byte [r10] ; pega o valor do registrador 2
+               sub al, bl
+               mov byte [r9], al ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          SUB_32_bits:
+               mov eax, dword [r9] ; pega o valor do registrador 1
+               mov ebx, dword [r10] ; pega o valor do registrador 2
+               sub eax, ebx
+               mov dword [r9], eax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
 
 ; -----------------------------
 ; AND R1, R2 (tam de R1 == tam de R2) - Código 0A
 ; 0A 76 -> AND H1, H0
 ; R1 = R1 and R2
 AND_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     inc rsi ; avança para pegar os proximos bytes
+     xor r8, r8 ; limpa r8
+     xor r9,r9 ; limpa r9
+     xor r10, r10 ; limpa r10
+     xor rax, rax ; limpa rax
+     xor rbx, rbx ; limpa rbx
+     xor rcx, rcx ; limpa rcx
+
+     mov al, byte [rsi]
+     shr al, 4 ; pega o código do primeiro registrador(o qual está na parte alta)
+     mov r8, rax ; move o codigo do registrador(salvo em rax) para r8
+     call obter_tamanho_registrador
+     push r8 ; Salva o tamanho do primeiro registrador na pilha
+
+     mov cl, byte [rsi]
+     and cl, 0fh ; pega o código do segundo registrador
+     mov r8, rcx
+     call obter_tamanho_registrador
+
+     pop rbx
+     cmp rbx, r8
+     jne invalid_instruction
+
+     AND_validado:
+          lea r9, [regs+rax*4] ; calcula o endereço do registrador 1
+          lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
+          inc rsi
+
+          cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+          je AND_8_bits
+          cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+          je AND_32_bits
+
+          AND_16_bits:
+               mov ax, word [r9] ; pega o valor do registrador 1
+               mov bx, word [r10] ; pega o valor do registrador 2
+               and ax, bx
+               mov word [r9], ax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          AND_8_bits:
+               mov al, byte [r9] ; pega o valor do registrador 1
+               mov bl, byte [r10] ; pega o valor do registrador 2
+               and al, bl
+               mov byte [r9], al ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          AND_32_bits:
+               mov eax, dword [r9] ; pega o valor do registrador 1
+               mov ebx, dword [r10] ; pega o valor do registrador 2
+               and eax, ebx
+               mov dword [r9], eax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
 
 ; -----------------------------
 ; OR R1, R2 (tam de R1 == tam de R2) - Código 0B
 ; 0B 23 -> OR D0, D1
 ; R1 = R1 or R2
 OR_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     inc rsi ; avança para pegar os proximos bytes
+     xor r8, r8 ; limpa r8
+     xor r9,r9 ; limpa r9
+     xor r10, r10 ; limpa r10
+     xor rax, rax ; limpa rax
+     xor rbx, rbx ; limpa rbx
+     xor rcx, rcx ; limpa rcx
+
+     mov al, byte [rsi]
+     shr al, 4 ; pega o código do primeiro registrador(o qual está na parte alta)
+     mov r8, rax ; move o codigo do registrador(salvo em rax) para r8
+     call obter_tamanho_registrador
+     push r8 ; Salva o tamanho do primeiro registrador na pilha
+
+     mov cl, byte [rsi]
+     and cl, 0fh ; pega o código do segundo registrador
+     mov r8, rcx
+     call obter_tamanho_registrador
+
+     pop rbx
+     cmp rbx, r8
+     jne invalid_instruction
+
+     OR_validado:
+          lea r9, [regs+rax*4] ; calcula o endereço do registrador 1
+          lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
+          inc rsi
+
+          cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+          je OR_8_bits
+          cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+          je OR_32_bits
+
+          OR_16_bits:
+               mov ax, word [r9] ; pega o valor do registrador 1
+               mov bx, word [r10] ; pega o valor do registrador 2
+               or ax, bx
+               mov word [r9], ax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          OR_8_bits:
+               mov al, byte [r9] ; pega o valor do registrador 1
+               mov bl, byte [r10] ; pega o valor do registrador 2
+               or al, bl
+               mov byte [r9], al ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          OR_32_bits:
+               mov eax, dword [r9] ; pega o valor do registrador 1
+               mov ebx, dword [r10] ; pega o valor do registrador 2
+               or eax, ebx
+               mov dword [r9], eax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
 
 ; -----------------------------
 ; XOR R1, R2 (tam de R1 == tam de R2) - Código 0C
 ; 0C 23 -> XOR D0, D1
 ; R1 = R1 xor R2
 XOR_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     inc rsi ; avança para pegar os proximos bytes
+     xor r8, r8 ; limpa r8
+     xor r9,r9 ; limpa r9
+     xor r10, r10 ; limpa r10
+     xor rax, rax ; limpa rax
+     xor rbx, rbx ; limpa rbx
+     xor rcx, rcx ; limpa rcx
+
+     mov al, byte [rsi]
+     shr al, 4 ; pega o código do primeiro registrador(o qual está na parte alta)
+     mov r8, rax ; move o codigo do registrador(salvo em rax) para r8 
+     call obter_tamanho_registrador
+     push r8 ; Salva o tamanho do primeiro registrador na pilha
+
+     mov cl, byte [rsi]
+     and cl, 0fh ; pega o código do segundo registrador (repete a parte baixa e coloca zero na parte alta)
+     mov r8, rcx
+     call obter_tamanho_registrador
+
+     pop rbx
+     cmp rbx, r8
+     jne invalid_instruction
+
+     XOR_validado:
+          lea r9, [regs+rax*4] ; calcula o endereço do registrador 1 (*4 pois cada posicao tem 4bits)
+          lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
+          inc rsi
+
+          cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+          je XOR_8_bits
+          cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+          je XOR_32_bits
+
+          XOR_16_bits:
+               mov ax, word [r9] ; pega o valor do registrador 1
+               mov bx, word [r10] ; pega o valor do registrador 2
+               xor ax, bx ;assim nao destruo o registrador1
+	       mov word [r9], ax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          XOR_8_bits:
+               mov al, byte [r9] ; pega o valor do registrador 1
+               mov bl, byte [r10] ; pega o valor do registrador 2
+               xor al, bl
+	       mov byte [r9], al ; Insere o resultado de volta no registrador 1
+	       call flags
+               jmp eterno ; sai da função
+
+          XOR_32_bits:
+               mov eax, dword [r9] ; pega o valor do registrador 1
+               mov ebx, dword [r10] ; pega o valor do registrador 2
+               xor eax, ebx
+	       mov dword [r9], eax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
 
 ; -----------------------------
 ; NOT R - Código 0D
 ; 0D 10 -> NOT A1
 ; R = ~R
 NOT_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     inc rsi ; avança para pegar os proximos bytes
+     xor r8, r8 ; limpa r8
+     xor r9,r9 ; limpa r9
+     xor rax, rax ; limpa rax
+     xor rbx, rbx ; limpa rbx
+     xor rcx, rcx ; limpa rcx
+
+     mov al, byte [rsi]
+     shr al, 4 ; pega o código do primeiro registrador(o qual está na parte alta)
+     mov r8, rax ; move o codigo do registrador(salvo em rax) para r8
+     call obter_tamanho_registrador
+
+     NOT_validado:
+          lea r9, [regs+rax*4] ; calcula o endereço do registrador 
+          inc rsi
+
+          cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+          je NOT_8_bits
+          cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+          je NOT_32_bits
+
+          NOT_16_bits:
+               mov ax, word [r9] ; pega o valor do registrador 1
+               not ax
+               mov word [r9], ax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          NOT_8_bits:
+               mov al, byte [r9] ; pega o valor do registrador 1
+               not al
+               mov byte [r9], al ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
+
+          NOT_32_bits:
+               mov eax, dword [r9] ; pega o valor do registrador 1
+               not eax
+               mov dword [r9], eax ; Insere o resultado de volta no registrador 1
+               call flags
+               jmp eterno ; sai da função
 
 ; -----------------------------
 ; CMP R1, R2 (tam de R1 == tam de R2) - Código 0E
 ; 0E 34 -> CMP D1, D2
 ; Equivale a um SUB sem reescrever R1, apenas seta flags
 CMP_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     inc rsi ; avança para pegar os proximos bytes
+     xor r8, r8 ; limpa r8
+     xor r9,r9 ; limpa r9
+     xor r10, r10 ; limpa r10
+     xor rax, rax ; limpa rax
+     xor rbx, rbx ; limpa rbx
+     xor rcx, rcx ; limpa rcx
+
+     mov al, byte [rsi]
+     shr al, 4 ; pega o código do primeiro registrador(o qual está na parte alta) 
+     mov r8, rax ; move o codigo do registrador(salvo em rax) para r8 
+     call obter_tamanho_registrador
+     push r8 ; Salva o tamanho do primeiro registrador na pilha
+
+     mov cl, byte [rsi]
+     and cl, 0fh ; pega o código do segundo registrador (repete a parte baixa e coloca zero na parte alta)
+     mov r8, rcx
+     call obter_tamanho_registrador
+
+     pop rbx
+     cmp rbx, r8
+     jne invalid_instruction
+
+     CMP_validado:
+          lea r9, [regs+rax*4] ; calcula o endereço do registrador 1 (*4 pois cada posicao tem 4bits)
+          lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
+          inc rsi
+
+          cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+          je CMP_8_bits
+          cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+          je CMP_32_bits
+
+          CMP_16_bits:
+               mov ax, word [r9] ; pega o valor do registrador 1
+               mov bx, word [r10] ; pega o valor do registrador 2
+               sub ax, bx ;assim nao destruo o registrador1
+               call flags
+               jmp eterno ; sai da função
+
+          CMP_8_bits:
+               mov al, byte [r9] ; pega o valor do registrador 1
+               mov bl, byte [r10] ; pega o valor do registrador 2
+               sub al, bl
+               call flags
+               jmp eterno ; sai da função
+
+          CMP_32_bits:
+               mov eax, dword [r9] ; pega o valor do registrador 1
+               mov ebx, dword [r10] ; pega o valor do registrador 2
+               sub eax, ebx
+               call flags
+               jmp eterno ; sai da função
 
 ; ---------------------------
 ; JMP - Código 0F
@@ -526,6 +839,7 @@ JL_OP:
      mov bl, byte [negativo]
      cmp bl, byte 1
      je JMP_OP ; Se for negativo = 1, dá o jump
+     
      add rsi, 1 ; Senão, faz o RSI apontar para a próxima instrução
      jmp eterno ; e volta
 
@@ -534,35 +848,76 @@ JL_OP:
 ; 11 -> JG
 ; Se negativo == 0 E zero == 0
 JG_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bl, byte [negativo]
+     cmp bl, byte 0
+     jne NaoEverdade  ; Se for negativo = 1, não corresponde a condição de JG e dá o jump para NaoEverdade
+
+     mov bl, byte [zero]
+     cmp bl, byte 0
+     jne NaoEverdade  ; Se for zero = 1, não corresponde a condição de JG e dá o jump para NaoEverdade
+
+     jmp JMP_OP ; se ambas as condições forem verdadeiras, dá o jump 
+
+     NaoEverdade:
+          add rsi, 1 ; faz o RSI apontar para a próxima instrução
+          jmp eterno ; volta
 
 ; -----------------------------
 ; JLE - Código 12
 ; 12 -> JLE
 ; Se negativo == 1 OU zero == 1
 JLE_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bl, byte [negativo]
+     cmp bl, byte 1
+     je JMP_OP  ; Se for negativo = 1, dá o jump
 
-; -----------------------------
+     mov bl, byte [zero]
+     cmp bl, byte 1
+     je JMP_OP ; Se for zero = 1, dá o jump
+
+     add rsi, 1 ; faz o RSI apontar para a próxima instrução
+     jmp eterno ; volta
+
+;------------------
 ; JGE - Código 13
 ; 13 -> JGE
 ; Se negativo == 0
 JGE_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bl, byte [negativo]
+     cmp bl, byte 0
+     je JMP_OP ; Se for zero = 0, dá o jump
+
+     add rsi, 1 ; faz o RSI apontar para a próxima instrução
+     jmp eterno ; volta
 
 ; -----------------------------
 ; JC - Código 14
 ; 14 -> JC
 ; Se carry == 1
 JC_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bl, byte [carry]
+     cmp bl, byte 1
+     je JMP_OP ; Se for carry = 1, dá o jump
+
+     add rsi, 1 ; faz o RSI apontar para a próxima instrução
+     jmp eterno ; volta
 
 ; -----------------------------
 ; JNC - Código 15
 ; 15 -> JNC
 ; Se carry == 0
 JNC_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bl, byte [carry]
+     cmp bl, byte 0
+     je JMP_OP ; Se for carry = 0, dá o jump
+
+     add rsi, 1 ; faz o RSI apontar para a próxima instrução
+     jmp eterno ; volta
 
 ; ---------------------------
 ; IN R (R = DO ou D1 ou D2 ou D3) - Código 16
@@ -623,7 +978,7 @@ OUT_OP:
           mov cl, byte [r15+rbx*4] ; Pega o caractere a ser impresso
           mov rsi, rcx ; Passa como parametro o caractere a ser impresso
           mov rax, 0 ; Sem registrador xmm (xmm serviria para passar um float como parametro)
-          call printf
+          call printf ; printf("%c\n", rcx)
           
           ; Restaura os valores dos registradores
           pop rsi

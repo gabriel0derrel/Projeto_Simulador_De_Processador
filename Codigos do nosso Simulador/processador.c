@@ -2,9 +2,12 @@
 #include <stdint.h>
 #include <string.h>
 
-extern  int8_t memoria[];
-extern  int32_t regs[];
-extern  void   executar();
+extern int8_t memoria[];
+extern int32_t regs[];
+extern void   executar();
+extern int8_t negativo;
+extern int8_t zero;
+extern int8_t carry;
 
 void print_memoria(){
     FILE *arquivo = fopen("memoria.txt", "w");
@@ -72,6 +75,7 @@ int main(int argc, char *argv[]){
         executar();
         printf("\nFim do Programa\n");
         printf("A0=%d A1=%d D0=%d D1=%d D2=%d D3=%d H0=%d H1=%d \n" ,(int16_t) regs[0], (int16_t) regs[1], (int8_t) regs[2],(int8_t) regs[3], (int8_t) regs[4], (int8_t) regs[5], (int32_t) regs[6], (int32_t) regs[7]);
+        printf("negativo=%d zero=%d carry=%d \n", negativo, zero, carry);
         print_memoria();
     }
     else{
