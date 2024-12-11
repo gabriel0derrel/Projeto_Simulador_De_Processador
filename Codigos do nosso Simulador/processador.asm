@@ -585,7 +585,13 @@ JC_OP:
 ; 15 -> JNC
 ; Se carry == 0
 JNC_OP:
-     ret ; Isso está aqui apenas para que o vetor de desvios não dê erro de compilação, remova-o quando começarem a implementar as instruções.
+     xor rbx, rbx
+     mov bl, byte [carry]
+     cmp bl, byte 0
+     je JMP_OP
+
+     add rsi, 1
+     jmp eterno
 
 ; ---------------------------
 ; IN R (R = DO ou D1 ou D2 ou D3) - Código 16
