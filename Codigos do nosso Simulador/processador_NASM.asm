@@ -62,6 +62,8 @@ obter_tamanho_registrador:
     mov r8, qword 8
     ret
     tamanho_32_bits:
+    cmp r8, qword 7
+    ja invalid_instruction
     mov r8, qword 32
     ret
 
@@ -750,6 +752,7 @@ NOT_OP:
                mov ax, word [r9] ; pega o valor do registrador 1
                not ax
                mov word [r9], ax ; Insere o resultado de volta no registrador 1
+               sub ax,0
                call flags
                jmp eterno ; sai da função
 
@@ -757,6 +760,7 @@ NOT_OP:
                mov al, byte [r9] ; pega o valor do registrador 1
                not al
                mov byte [r9], al ; Insere o resultado de volta no registrador 1
+               sub al,0
                call flags
                jmp eterno ; sai da função
 
@@ -764,6 +768,7 @@ NOT_OP:
                mov eax, dword [r9] ; pega o valor do registrador 1
                not eax
                mov dword [r9], eax ; Insere o resultado de volta no registrador 1
+               sub eax,0
                call flags
                jmp eterno ; sai da função
 
