@@ -1,8 +1,0 @@
-// Para compilar, execute os seguintes comandos
-make
-./exec ou ./exec teste.dasm
-
-// Para recompilar
-make clean
-make
-./exec ou ./exec teste.dasm

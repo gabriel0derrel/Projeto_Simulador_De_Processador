@@ -31,6 +31,7 @@ segment  .data
      negativo: db 0 
      zero:db 0
      carry:db 0
+     
      ;----
      ; executa a partir do zero
      desvios: dq  $PUSH_OP,$POP_OP,$LOADC_OP,$LOAD_END_OP,$LOAD_RX_OP,$STORE_END_OP,$STORE_RX_OP,$HALT_OP,$ADD_OP,$SUB_OP,$AND_OP,$OR_OP,$XOR_OP,$NOT_OP,$CMP_OP,$JMP_OP,$JL_OP,$JG_OP,$JLE_OP,$JGE_OP,$JC_OP,$JNC_OP,$IN_OP,$OUT_OP
