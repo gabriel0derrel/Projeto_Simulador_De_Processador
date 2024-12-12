@@ -7,7 +7,7 @@ O projeto foi desenvolvido como parte da avaliação final da disciplina e tem c
 
 ## Conteúdo do Repositório
 - **`Codigos do nosso Simulador/`**: Contém os códigos-fonte do simulador em Assembly (NASM) e C.
-- **O arquivo `tarq1.pdf` com as especificações do processador.
+- O arquivo `tarq1.pdf` com as especificações do processador.
 - **`tests/`**: Arquivos de teste para validação do simulador.
 - **`README.md`**: Este arquivo com as instruções e descrição do projeto.
 
@@ -57,7 +57,7 @@ O processador implementado no simulador segue as especificações do arquivo `ta
 
 ## Autores
 Este projeto foi desenvolvido por:
-- **[Gabriel Derrel Martins Santee]**(https://github.com/gabriel0derrel)
-- **[Guilherme Ponciano Silva]**(https://github.com/Guilheme-collab)
-- **[Lucas Pereira Nunes]**(https://github.com/Prizrak2)
-- **[Ronaldo Oliveira de Jesus]**(https://github.com/ParadoxIsReal)
+- [Gabriel Derrel Martins Santee](https://github.com/gabriel0derrel)
+- [Guilherme Ponciano Silva](https://github.com/Guilheme-collab)
+- [Lucas Pereira Nunes](https://github.com/Prizrak2)
+- [Ronaldo Oliveira de Jesus](https://github.com/ParadoxIsReal)
