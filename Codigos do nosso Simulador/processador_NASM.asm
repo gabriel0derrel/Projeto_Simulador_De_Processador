@@ -3,7 +3,7 @@
 ; Guilherme Ponciano Silva
 ; Lucas Pereira Nunes
 ; Ronaldo Oliveira de Jesus
-;
+
 ; --------- Legenda dos Registradores Utilizados ----------
 ; RSI -> Aponta para o byte atual na memória (Inalterado)
 ; RDI -> Aponta para o topo da pilha (Inalterado)
