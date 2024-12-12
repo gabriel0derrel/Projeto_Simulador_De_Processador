@@ -1,3 +1,8 @@
-nasm -f elf64 processador.asm
-gcc -m64 -no-pie processador.c processador.o -o exec
-./exec
+// Para compilar, execute os seguintes comandos
+make
+./exec ou ./exec teste.dasm
+
+// Para recompilar
+make clean
+make
+./exec ou ./exec teste.dasm

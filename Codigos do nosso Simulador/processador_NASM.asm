@@ -1,9 +1,16 @@
+; ----------------------- GRUPO ---------------------------------
+; Gabriel Derrel Martins Santee
+; Guilherme Ponciano Silva
+; Lucas Pereira Nunes
+; Ronaldo Oliveira de Jesus
+
 ; --------- Legenda dos Registradores Utilizados ----------
 ; RSI -> Aponta para o byte atual na memória (Inalterado)
 ; RDI -> Aponta para o topo da pilha (Inalterado)
 ; r15 -> Aponta para o início do vetor de registradores (Inalterado)
-; r9 -> Aponta para 1 registrador do vetor de registradores
-; r10 -> Aponta para uma posição de memória
+; r8 -> Utilizado para chamar a função obter_tamanho_registrador
+; r9 -> Aponta para um registrador do vetor de registradores
+; r10 -> Aponta para uma posição de memória ou um outro registrador do vetor de registradores
 
 
 global  memoria
