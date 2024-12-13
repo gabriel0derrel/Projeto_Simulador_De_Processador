@@ -1,4 +1,4 @@
-# Projeto De Um Simulador De Um Processador
+# Projeto Simulador De Um Processador
 
 Este repositório contém o trabalho final da disciplina **Arquitetura de Computadores 1**, que consiste na implementação de um simulador de um processador baseado nas especificações definidas no documento `tarq1.pdf`.
 
