@@ -4,6 +4,10 @@
 ; Lucas Pereira Nunes
 ; Ronaldo Oliveira de Jesus
 
+; --------------------------- GitHub -----------------------------
+; Código no Github:
+; https://github.com/gabriel0derrel/Projeto_Simulador_De_Processador
+
 ; --------- Legenda dos Registradores Utilizados ----------
 ; RSI -> Aponta para o byte atual na memória (Inalterado)
 ; RDI -> Aponta para o topo da pilha (Inalterado)
