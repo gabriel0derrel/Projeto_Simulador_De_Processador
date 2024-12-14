@@ -24,6 +24,7 @@ int main(int argc, char *argv[]){
     if(argc == 1){
         printf("Digite o código a ser executado em letras maiusculas, duas letras por byte, ordem little endian(por exemplo, o endereço 0x001A deve ser digitado como 1A 00)\n");
         scanf("%s",buffer); // Lê o codigo digitado pelo usuario no terminal
+        scanf("%*c"); // Limpa o buffer
     }
     else{
         FILE *arquivo = fopen(argv[1], "r"); // Abre o arquivo digitado pelo usuario
