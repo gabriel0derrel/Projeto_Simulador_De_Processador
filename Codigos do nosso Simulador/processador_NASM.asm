@@ -1,4 +1,4 @@
-; ----------------------- GRUPO ---------------------------------
+; --------------------------- GRUPO ------------------------------
 ; Gabriel Derrel Martins Santee
 ; Guilherme Ponciano Silva
 ; Lucas Pereira Nunes
@@ -8,7 +8,7 @@
 ; Código no Github:
 ; https://github.com/gabriel0derrel/Projeto_Simulador_De_Processador
 
-; --------- Legenda dos Registradores Utilizados ----------
+; ------------ Legenda dos Registradores Utilizados --------------
 ; RSI -> Aponta para o byte atual na memória (Inalterado)
 ; RDI -> Aponta para o topo da pilha (Inalterado)
 ; r15 -> Aponta para o início do vetor de registradores (Inalterado)
