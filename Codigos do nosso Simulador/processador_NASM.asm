@@ -116,23 +116,23 @@ PUSH_OP:
      lea r9, [r15+rax*4] ; calcula o endereço do registrador
      inc rsi ; avança para o rsi apontar para a proxima instrucao
      cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-     je PUSH_8_bits
+     je .PUSH_8_bits
      cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-     je PUSH_32_bits
+     je .PUSH_32_bits
 
-     PUSH_16_bits: ; se não é um dos dois, então é de 16 bits
+     .PUSH_16_bits: ; se não é um dos dois, então é de 16 bits
           mov bx, word [r9] ; pega 2 bytes seguidos da pilha
           sub rdi, 2
           mov word [rdi], bx
           jmp eterno ; sai da função
 
-     PUSH_8_bits:
+     .PUSH_8_bits:
           mov bl, byte [r9] ; pega 1 byte da pilha
           sub rdi, 1
           mov byte [rdi], bl
           jmp eterno ; sai da função
 
-     PUSH_32_bits:
+     .PUSH_32_bits:
           mov ebx, dword [r9] ; pega 4 bytes seguidos da pilha
           sub rdi, 4
           mov dword [rdi], ebx
@@ -156,23 +156,23 @@ POP_OP:
      lea r9, [r15+rax*4] ; calcula o endereço do registrador
      inc rsi ; avança para o rsi apontar para a proxima instrucao
      cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-     je POP_8_bits
+     je .POP_8_bits
      cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-     je POP_32_bits
+     je .POP_32_bits
 
-     POP_16_bits: ; se não é um dos dois, então é de 16 bits
+     .POP_16_bits: ; se não é um dos dois, então é de 16 bits
           mov bx, word [rdi] ; pega 2 bytes seguidos da pilha
           add rdi, 2
           mov word [r9], bx
           jmp eterno ; sai da função
 
-     POP_8_bits:
+     .POP_8_bits:
           mov bl, byte [rdi] ; pega 1 byte da pilha
           add rdi, 1
           mov byte [r9], bl
           jmp eterno ; sai da função
 
-     POP_32_bits:
+     .POP_32_bits:
           mov ebx, dword [rdi] ; pega 4 bytes seguidos da pilha
           add rdi, 4
           mov dword [r9], ebx
@@ -198,23 +198,23 @@ LOADC_OP:
      lea r9, [r15+rax*4] ; calcula o endereço do registrador
      inc rsi ; avança o ponteiro de instruções para pegar a constante a ser armazenada
      cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-     je LOADC_8_bits
+     je .LOADC_8_bits
      cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-     je LOADC_32_bits
+     je .LOADC_32_bits
 
-     LOADC_16_bits: ; se não é um dos dois, então é de 16 bits
+     .LOADC_16_bits: ; se não é um dos dois, então é de 16 bits
           mov bx, word [rsi] ; pega 2 bytes seguidos da memoria
           mov word [r9], bx
           add rsi, 2 ; avança 2 bytes
           jmp eterno ; sai da função
 
-     LOADC_8_bits:
+     .LOADC_8_bits:
           mov bl, byte [rsi] ; pega 1 byte da memoria
           mov byte [r9], bl
           add rsi, 1 ; avança 1 byte
           jmp eterno ; sai da função
 
-     LOADC_32_bits:
+     .LOADC_32_bits:
           mov ebx, dword [rsi] ; pega 4 bytes seguidos da memoria
           mov dword [r9], ebx
           add rsi, 4 ; avança 4 bytes
@@ -243,21 +243,21 @@ LOAD_END_OP:
      add rsi, 2 ; avança 2 bytes
 
      cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-     je LOAD_END_8_bits
+     je .LOAD_END_8_bits
      cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-     je LOAD_END_32_bits
+     je .LOAD_END_32_bits
 
-     LOAD_END_16_bits:
+     .LOAD_END_16_bits:
           mov bx, word [r10] ; pega 2 bytes seguidos da memoria a partir do endereço calculado(r10)
           mov word [r9], bx
           jmp eterno ; sai da função
 
-     LOAD_END_8_bits:
+     .LOAD_END_8_bits:
           mov bl, byte [r10] ; pega 1 byte da memoria a partir do endereço calculado(r10)
           mov byte [r9], bl
           jmp eterno ; sai da função
 
-     LOAD_END_32_bits:
+     .LOAD_END_32_bits:
           mov ebx, dword [r10] ; pega 4 bytes seguidos da memoria a partir do endereço calculado(r10)
           mov dword [r9], ebx
           jmp eterno ; sai da função
@@ -282,7 +282,7 @@ LOAD_RX_OP:
      cmp r8, qword 16
      jne invalid_instruction
 
-     LOAD_validado:
+     .LOAD_validado:
           mov al, byte [rsi] ; pega o byte do registrador
           shr al, 4 ; desloca 4 bits para a direita para pegar o código do registrador
           mov r8, rax ; move o codigo do registrador(salvo em rax) para r8
@@ -295,21 +295,21 @@ LOAD_RX_OP:
           lea r10, [memoria+r11] ; calcula o endereço na memória apontado pelo endereço salvo no registrador
           inc rsi
           cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-          je LOAD_RX_8_bits
+          je .LOAD_RX_8_bits
           cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-          je LOAD_RX_32_bits
+          je .LOAD_RX_32_bits
 
-          LOAD_RX_16_bits:
+          .LOAD_RX_16_bits:
                mov bx, word [r10] ; pega 2 bytes seguidos da memoria a partir do endereço calculado(r10)
                mov word [r9], bx
                jmp eterno ; sai da função
 
-          LOAD_RX_8_bits:
+          .LOAD_RX_8_bits:
                mov bl, byte [r10] ; pega 1 byte da memoria a partir do endereço calculado(r10)
                mov byte [r9], bl
                jmp eterno ; sai da função
 
-          LOAD_RX_32_bits:
+          .LOAD_RX_32_bits:
                mov ebx, dword [r10] ; pega 4 bytes seguidos da memoria a partir do endereço calculado(r10)
                mov dword [r9], ebx
                jmp eterno ; sai da função
@@ -339,21 +339,21 @@ STORE_END_OP:
      inc rsi
      
      cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-     je STORE_END_8_bits
+     je .STORE_END_8_bits
      cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-     je STORE_END_32_bits
+     je .STORE_END_32_bits
 
-     STORE_END_16_bits:
+     .STORE_END_16_bits:
           mov bx, word [r9] ; pega o valor do registrador apontado por r9
           mov word [r10], bx ; Move o valor para a posição na memória apontada por r10
           jmp eterno ; sai da função
 
-     STORE_END_8_bits:
+     .STORE_END_8_bits:
           mov bl, byte [r9] ; pega o valor do registrador apontado por r9
           mov byte [r10], bl ; Move o valor para a posição na memória apontada por r10
           jmp eterno ; sai da função
 
-     STORE_END_32_bits:
+     .STORE_END_32_bits:
           mov ebx, dword [r9] ; pega o valor do registrador apontado por r9
           mov dword [r10], ebx ; Move o valor para a posição na memória apontada por r10
           jmp eterno ; sai da função
@@ -378,7 +378,7 @@ STORE_RX_OP:
      cmp r8, qword 16
      jne invalid_instruction
 
-     STORE_validado:
+     .STORE_validado:
 
           mov al, byte [rsi] ; pega o byte do registrador
           and al, 0fh ; pega o código do segundo registrador
@@ -392,21 +392,21 @@ STORE_RX_OP:
           lea r10, [memoria+r11] ; calcula o endereço na memória apontado pelo endereço salvo no registrador
           inc rsi
           cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-          je STORE_RX_8_bits
+          je .STORE_RX_8_bits
           cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-          je STORE_RX_32_bits
+          je .STORE_RX_32_bits
 
-          STORE_RX_16_bits:
+          .STORE_RX_16_bits:
                mov bx, word [r9] ; pega o valor do registrador apontado por r9
                mov word [r10], bx ; Move o valor para a posição na memória apontada por r10
                jmp eterno ; sai da função
 
-          STORE_RX_8_bits:
+          .STORE_RX_8_bits:
                mov bl, byte [r9] ; pega o valor do registrador apontado por r9
                mov byte [r10], bl ; Move o valor para a posição na memória apontada por r10
                jmp eterno ; sai da função
 
-          STORE_RX_32_bits:
+          .STORE_RX_32_bits:
                mov ebx, dword [r9] ; pega o valor do registrador apontado por r9
                mov dword [r10], ebx ; Move o valor para a posição na memória apontada por r10
                jmp eterno ; sai da função
@@ -445,17 +445,17 @@ ADD_OP:
      cmp rbx, r8
      jne invalid_instruction
 
-     ADD_validado:
+     .ADD_validado:
           lea r9, [regs+rax*4] ; calcula o endereço do registrador 1
           lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
           inc rsi
 
           cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-          je ADD_8_bits
+          je .ADD_8_bits
           cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-          je ADD_32_bits
+          je .ADD_32_bits
 
-          ADD_16_bits:
+          .ADD_16_bits:
                mov ax, word [r9] ; pega o valor do registrador 1
                mov bx, word [r10] ; pega o valor do registrador 2
                add ax, bx
@@ -463,7 +463,7 @@ ADD_OP:
                call flags
                jmp eterno ; sai da função
 
-          ADD_8_bits:
+          .ADD_8_bits:
                mov al, byte [r9] ; pega o valor do registrador 1
                mov bl, byte [r10] ; pega o valor do registrador 2
                add al, bl
@@ -471,7 +471,7 @@ ADD_OP:
                call flags
                jmp eterno ; sai da função
 
-          ADD_32_bits:
+          .ADD_32_bits:
                mov eax, dword [r9] ; pega o valor do registrador 1
                mov ebx, dword [r10] ; pega o valor do registrador 2
                add eax, ebx
@@ -507,17 +507,17 @@ SUB_OP:
      cmp rbx, r8
      jne invalid_instruction
 
-     SUB_validado:
+     .SUB_validado:
           lea r9, [regs+rax*4] ; calcula o endereço do registrador 1
           lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
           inc rsi
 
           cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-          je SUB_8_bits
+          je .SUB_8_bits
           cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-          je SUB_32_bits
+          je .SUB_32_bits
 
-          SUB_16_bits:
+          .SUB_16_bits:
                mov ax, word [r9] ; pega o valor do registrador 1
                mov bx, word [r10] ; pega o valor do registrador 2
                sub ax, bx
@@ -525,7 +525,7 @@ SUB_OP:
                call flags
                jmp eterno ; sai da função
 
-          SUB_8_bits:
+          .SUB_8_bits:
                mov al, byte [r9] ; pega o valor do registrador 1
                mov bl, byte [r10] ; pega o valor do registrador 2
                sub al, bl
@@ -533,7 +533,7 @@ SUB_OP:
                call flags
                jmp eterno ; sai da função
 
-          SUB_32_bits:
+          .SUB_32_bits:
                mov eax, dword [r9] ; pega o valor do registrador 1
                mov ebx, dword [r10] ; pega o valor do registrador 2
                sub eax, ebx
@@ -569,17 +569,17 @@ AND_OP:
      cmp rbx, r8
      jne invalid_instruction
 
-     AND_validado:
+     .AND_validado:
           lea r9, [regs+rax*4] ; calcula o endereço do registrador 1
           lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
           inc rsi
 
           cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-          je AND_8_bits
+          je .AND_8_bits
           cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-          je AND_32_bits
+          je .AND_32_bits
 
-          AND_16_bits:
+          .AND_16_bits:
                mov ax, word [r9] ; pega o valor do registrador 1
                mov bx, word [r10] ; pega o valor do registrador 2
                and ax, bx
@@ -587,7 +587,7 @@ AND_OP:
                call flags
                jmp eterno ; sai da função
 
-          AND_8_bits:
+          .AND_8_bits:
                mov al, byte [r9] ; pega o valor do registrador 1
                mov bl, byte [r10] ; pega o valor do registrador 2
                and al, bl
@@ -595,7 +595,7 @@ AND_OP:
                call flags
                jmp eterno ; sai da função
 
-          AND_32_bits:
+          .AND_32_bits:
                mov eax, dword [r9] ; pega o valor do registrador 1
                mov ebx, dword [r10] ; pega o valor do registrador 2
                and eax, ebx
@@ -631,17 +631,17 @@ OR_OP:
      cmp rbx, r8
      jne invalid_instruction
 
-     OR_validado:
+     .OR_validado:
           lea r9, [regs+rax*4] ; calcula o endereço do registrador 1
           lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
           inc rsi
 
           cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-          je OR_8_bits
+          je .OR_8_bits
           cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-          je OR_32_bits
+          je .OR_32_bits
 
-          OR_16_bits:
+          .OR_16_bits:
                mov ax, word [r9] ; pega o valor do registrador 1
                mov bx, word [r10] ; pega o valor do registrador 2
                or ax, bx
@@ -649,7 +649,7 @@ OR_OP:
                call flags
                jmp eterno ; sai da função
 
-          OR_8_bits:
+          .OR_8_bits:
                mov al, byte [r9] ; pega o valor do registrador 1
                mov bl, byte [r10] ; pega o valor do registrador 2
                or al, bl
@@ -657,7 +657,7 @@ OR_OP:
                call flags
                jmp eterno ; sai da função
 
-          OR_32_bits:
+          .OR_32_bits:
                mov eax, dword [r9] ; pega o valor do registrador 1
                mov ebx, dword [r10] ; pega o valor do registrador 2
                or eax, ebx
@@ -693,17 +693,17 @@ XOR_OP:
      cmp rbx, r8
      jne invalid_instruction
 
-     XOR_validado:
+     .XOR_validado:
           lea r9, [regs+rax*4] ; calcula o endereço do registrador 1 (*4 pois cada posicao tem 4bits)
           lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
           inc rsi
 
           cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-          je XOR_8_bits
+          je .XOR_8_bits
           cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-          je XOR_32_bits
+          je .XOR_32_bits
 
-          XOR_16_bits:
+          .XOR_16_bits:
                mov ax, word [r9] ; pega o valor do registrador 1
                mov bx, word [r10] ; pega o valor do registrador 2
                xor ax, bx ;assim nao destruo o registrador1
@@ -711,7 +711,7 @@ XOR_OP:
                call flags
                jmp eterno ; sai da função
 
-          XOR_8_bits:
+          .XOR_8_bits:
                mov al, byte [r9] ; pega o valor do registrador 1
                mov bl, byte [r10] ; pega o valor do registrador 2
                xor al, bl
@@ -719,7 +719,7 @@ XOR_OP:
 	       call flags
                jmp eterno ; sai da função
 
-          XOR_32_bits:
+          .XOR_32_bits:
                mov eax, dword [r9] ; pega o valor do registrador 1
                mov ebx, dword [r10] ; pega o valor do registrador 2
                xor eax, ebx
@@ -748,11 +748,11 @@ NOT_OP:
      inc rsi
 
      cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-     je NOT_8_bits
+     je .NOT_8_bits
      cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-     je NOT_32_bits
+     je .NOT_32_bits
 
-     NOT_16_bits:
+     .NOT_16_bits:
           mov ax, word [r9] ; pega o valor do registrador 1
           not ax
           mov word [r9], ax ; Insere o resultado de volta no registrador 1
@@ -760,7 +760,7 @@ NOT_OP:
           call flags
           jmp eterno ; sai da função
 
-     NOT_8_bits:
+     .NOT_8_bits:
           mov al, byte [r9] ; pega o valor do registrador 1
           not al
           mov byte [r9], al ; Insere o resultado de volta no registrador 1
@@ -768,7 +768,7 @@ NOT_OP:
           call flags
           jmp eterno ; sai da função
 
-     NOT_32_bits:
+     .NOT_32_bits:
           mov eax, dword [r9] ; pega o valor do registrador 1
           not eax
           mov dword [r9], eax ; Insere o resultado de volta no registrador 1
@@ -804,31 +804,31 @@ CMP_OP:
      cmp rbx, r8
      jne invalid_instruction
 
-     CMP_validado:
+     .CMP_validado:
           lea r9, [regs+rax*4] ; calcula o endereço do registrador 1 (*4 pois cada posicao tem 4bits)
           lea r10, [regs+rcx*4] ; calcula o endereço do registrador 2
           inc rsi
 
           cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-          je CMP_8_bits
+          je .CMP_8_bits
           cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-          je CMP_32_bits
+          je .CMP_32_bits
 
-          CMP_16_bits:
+          .CMP_16_bits:
                mov ax, word [r9] ; pega o valor do registrador 1
                mov bx, word [r10] ; pega o valor do registrador 2
                sub ax, bx ;assim nao destruo o registrador1
                call flags
                jmp eterno ; sai da função
 
-          CMP_8_bits:
+          .CMP_8_bits:
                mov al, byte [r9] ; pega o valor do registrador 1
                mov bl, byte [r10] ; pega o valor do registrador 2
                sub al, bl
                call flags
                jmp eterno ; sai da função
 
-          CMP_32_bits:
+          .CMP_32_bits:
                mov eax, dword [r9] ; pega o valor do registrador 1
                mov ebx, dword [r10] ; pega o valor do registrador 2
                sub eax, ebx
@@ -867,15 +867,15 @@ JG_OP:
      xor rbx, rbx
      mov bl, byte [negativo]
      cmp bl, byte 0
-     jne NaoEverdade  ; Se for negativo = 1, não corresponde a condição de JG e dá o jump para NaoEverdade
+     jne .NaoEverdade  ; Se for negativo = 1, não corresponde a condição de JG e dá o jump para NaoEverdade
 
      mov bl, byte [zero]
      cmp bl, byte 0
-     jne NaoEverdade  ; Se for zero = 1, não corresponde a condição de JG e dá o jump para NaoEverdade
+     jne .NaoEverdade  ; Se for zero = 1, não corresponde a condição de JG e dá o jump para NaoEverdade
 
      jmp JMP_OP ; se ambas as condições forem verdadeiras, dá o jump 
 
-     NaoEverdade:
+     .NaoEverdade:
           add rsi, 1 ; faz o RSI apontar para a próxima instrução
           jmp eterno ; volta
 
@@ -951,7 +951,7 @@ IN_OP:
      cmp r8, qword 8
      jne invalid_instruction
 
-     IN_validado:
+     .IN_validado:
           ; Salva o valor dos registradores na pilha
           push rbp
           push rdi
@@ -983,7 +983,7 @@ OUT_OP:
      cmp r8, qword 8
      jne invalid_instruction
 
-     OUT_validado:
+     .OUT_validado:
           ; Salva o valor dos registradores na pilha
           push rbp
           push rdi
