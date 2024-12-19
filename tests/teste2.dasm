@@ -1,5 +1,6 @@
-02 60 02 20 10 07
-02 00 1A 00
-06 06
-00 00
-0F
+; O código insere um comando na posição 001A, pula para essa posição e executa o comando colocado
+02 60 02 20 10 07 ; LOAD H0, 07102002 -> 02 20 10 07 == LOAD D0, 10 - HALT
+02 00 1A 00 ; LOAD A0, 001A
+06 06 ; STORE A0, H0
+00 00 ; PUSH A0
+0F ; JMP

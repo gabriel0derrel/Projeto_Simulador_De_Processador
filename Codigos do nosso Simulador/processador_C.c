@@ -33,8 +33,16 @@ int main(int argc, char *argv[]){
             return -1;
         }
         char c;
+        int ignorar = 0;
         while ((c = fgetc(arquivo)) != EOF) {
-            if(c != '\n' && c != ' '){
+            // Ignora o que estiver entre o ; e o \n
+            if(c == ';'){
+                ignorar = 1;
+            } else if (c == '\n') {
+                ignorar = 0;
+            }
+            
+            if(!ignorar && c != '\n' && c != ' '){
                 buffer[k++] = c;
             }
         }
@@ -42,10 +50,10 @@ int main(int argc, char *argv[]){
     }
     int tamanho_lido = strlen(buffer); // Obtem o numero de caracteres
     if(tamanho_lido % 2 == 0){
-        // Loop para converter os bytes do buffer para byte em hexadecimal e armazenar no vetor codigo
+        // Loop para converter os bytes do buffer para inteito e armazenar no vetor mempria
         while (buffer[i]!=0){
             aux=buffer[i++]; // Obtem o caractere atual do buffer e avança para o próximo caractere
-            // Convete a primeira parte do byte de ASCII para hexadecimal
+            // Convete a primeira parte do byte de ASCII para inteiro
             if(aux < 58 && aux > 47){ // Se o caractere está entre 48 e 57 (0-9), converte para o número correspondente
                 aux=aux-48; 
             }
@@ -53,11 +61,11 @@ int main(int argc, char *argv[]){
                 if(aux < 71 && aux > 64){ // Se o caractere está entre 65 e 70 (A-F), converte para o número correspondente em hexa
                     aux=aux-55;
                 } else {
-                    printf("Erro no Código1\n");
+                    printf("Erro no Código\n");
                     return -1;
                 }
             }
-            // Convete a segunda parte do byte de ASCII para hexadecimal
+            // Convete a segunda parte do byte de ASCII para inteiro
             if(buffer[i] < 58 && buffer[i] > 47){ // Se o caractere está entre 48 e 57(ou seja, é um caractere de 0 a 9), converte para o número correspondente
                 aux=aux*16+buffer[i++]-48; // converte o caractere atual, adiciona ao valor anterior multiplicado por 16 e avança para o próximo caractere
             } 
@@ -65,13 +73,12 @@ int main(int argc, char *argv[]){
                 if(buffer[i] < 71 && buffer[i] > 64){ // Se o caractere está entre 65 e 70(ou seja, é um caractere de A a F), converte para o número correspondente
                     aux=aux*16+buffer[i++]-55; // converte o caractere atual, adiciona ao valor anterior multiplicado por 16 e avança para o próximo caractere
                 } else {
-                    printf("Erro no Código2\n");
+                    printf("Erro no Código\n");
                     return -1;
                 }
             }
-            memoria[j++]=aux;
+            memoria[j++]=aux; // A posição j do vetor recebe o inteiro convertido e depois j é incrementado
         }
-        //print_memoria();
         printf("\nChamando modulo cpu asm \n");
         executar();
         printf("\nFim do Programa\n");
@@ -86,7 +93,7 @@ int main(int argc, char *argv[]){
         print_memoria();
     }
     else{
-        printf("Erro no Código3\n");
+        printf("Erro no Código\n");
         return -1;
     }
     

@@ -25,7 +25,7 @@ extern getchar
 extern printf
 segment  .data
      memoria:times 65536 db 0 
-     FIM_PILHA equ $ ; aponta para o fim da memoria
+     TOPO_PILHA equ $ ; aponta para o fim da memoria
      regs: times 8 dd 0000
 
      invalido_msg: db "Instrução Inválida",0ah
@@ -43,30 +43,30 @@ segment  .data
 segment .text
     executar: 
           mov rsi, memoria      ; funciona com IP(Ponteiro para a instrucao)
-          mov rdi, $FIM_PILHA  ; funciona com SP(Ponteiro para o topo da pilha)
+          mov rdi, $TOPO_PILHA  ; funciona com SP(Ponteiro para o topo da pilha)
           mov r15, regs       ; r15 aponta para os registradores
     eterno:
           xor rdx,rdx ; limpa rdx
           mov dl, byte [rsi] ; pega o byte da instrucao
           cmp dl, 18h   ; instrucao valida < 0x18
           jl execx
-          ret
+          jmp invalid_instruction
      execx:
          jmp qword  [desvios+rdx*8]
 ;-------------------------------------------------
 
 obter_tamanho_registrador:
-    tamanho_16_bits:
+    .tamanho_16_bits:
     cmp r8, qword 1
-    ja tamanho_8_bits
+    ja .tamanho_8_bits
     mov r8, qword 16
     ret
-    tamanho_8_bits:
+    .tamanho_8_bits:
     cmp r8, qword 5
-    ja tamanho_32_bits
+    ja .tamanho_32_bits
     mov r8, qword 8
     ret
-    tamanho_32_bits:
+    .tamanho_32_bits:
     cmp r8, qword 7
     ja invalid_instruction
     mov r8, qword 32
@@ -744,38 +744,37 @@ NOT_OP:
      mov r8, rax ; move o codigo do registrador(salvo em rax) para r8
      call obter_tamanho_registrador
 
-     NOT_validado:
-          lea r9, [regs+rax*4] ; calcula o endereço do registrador 
-          inc rsi
+     lea r9, [regs+rax*4] ; calcula o endereço do registrador 
+     inc rsi
 
-          cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
-          je NOT_8_bits
-          cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
-          je NOT_32_bits
+     cmp r8, qword 8 ; vai para o codigo de 8 bits caso o registrador seja de 8 bits
+     je NOT_8_bits
+     cmp r8, qword 32 ;  vai para o codigo de 32 bits caso o registrador seja de 32 bits
+     je NOT_32_bits
 
-          NOT_16_bits:
-               mov ax, word [r9] ; pega o valor do registrador 1
-               not ax
-               mov word [r9], ax ; Insere o resultado de volta no registrador 1
-               sub ax,0
-               call flags
-               jmp eterno ; sai da função
+     NOT_16_bits:
+          mov ax, word [r9] ; pega o valor do registrador 1
+          not ax
+          mov word [r9], ax ; Insere o resultado de volta no registrador 1
+          sub ax,0
+          call flags
+          jmp eterno ; sai da função
 
-          NOT_8_bits:
-               mov al, byte [r9] ; pega o valor do registrador 1
-               not al
-               mov byte [r9], al ; Insere o resultado de volta no registrador 1
-               sub al,0
-               call flags
-               jmp eterno ; sai da função
+     NOT_8_bits:
+          mov al, byte [r9] ; pega o valor do registrador 1
+          not al
+          mov byte [r9], al ; Insere o resultado de volta no registrador 1
+          sub al,0
+          call flags
+          jmp eterno ; sai da função
 
-          NOT_32_bits:
-               mov eax, dword [r9] ; pega o valor do registrador 1
-               not eax
-               mov dword [r9], eax ; Insere o resultado de volta no registrador 1
-               sub eax,0
-               call flags
-               jmp eterno ; sai da função
+     NOT_32_bits:
+          mov eax, dword [r9] ; pega o valor do registrador 1
+          not eax
+          mov dword [r9], eax ; Insere o resultado de volta no registrador 1
+          sub eax,0
+          call flags
+          jmp eterno ; sai da função
 
 ; -----------------------------
 ; CMP R1, R2 (tam de R1 == tam de R2) - Código 0E

@@ -1,10 +1,12 @@
-02 60 02 20 10 07
-02 00 1C 00
-02 30 01
-02 40 02
-06 06
-0E 34
-00 00
-15
-02 20 20
-07
+; O código insere um comando na posição 001C, pula para essa posição e executa o comando alocado colocando
+; 10 em D0 se não houver carry, caso haja, D0 receberá 20.
+02 60 02 20 10 07 ; LOAD H0, 07102002 -> 02 20 10 07 == LOAD D0, 10 - HALT
+02 00 1C 00 ; LOAD A0, 001C
+02 30 01 ; LOAD D1, 01
+02 40 02 ; LOAD D2, 02
+06 06 ; STORE A0, H0
+0E 34 ; CMP D1, D2
+00 00 ; PUSH A0
+15 ; JNC
+02 20 20 ; LOAD D0, 20
+07 ; HALT
